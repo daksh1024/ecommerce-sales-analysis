@@ -1,4 +1,4 @@
-# ecommerce-sales-analysis
+# Ecommerce Sales Analysis
 Statistical approach towards online clothes sales analysis
 
 Introduction
