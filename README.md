@@ -12,3 +12,25 @@ Choosing a color is a subjective thing for most but certain colors might be pref
 Ratings are an important marker for a customer to see if a product is good or not. Hence, to know from where agood rating count can be achieved is crucial for a company. We compare ratings for products based on theirshipping prices, number of shipping countries, product has been given an ad-boost or not, if it has specialbadges that signify if that product is of good quality, availability of fast shipping or products being made locally.We performed AOVA, linear regression and permutation test to answer this question.
 Data Source and Preparation
 The dataset used is taken from Kaggle. It is a public dataset and has been permitted for general use. Essentially,this data fi nds its origin from Wish Uk’s e-commerce platform. It is a subset of total sales data showing thesummer sales for July 2020, and contains 43 columns and 1574 rows.
+
+Conclusion
+It was very interesting data set to work on as our Null Hypothesis was rejected in some scenarios and insome cases, we did not reject our Null Hypothesis.
+To give the marketing or sales team an analysis of what factors aff ected Sales in the UK on Wish’s platform,we can confi dently say that:
+Price does not aff ect sales volume (inferred from question 1).
+Product color aff ects sales volume. Buyers preferred cool colors over warm colors (inferred fromquestion 2).
+Shipping fee did not aff ect product ratings while products that were shipped to more countries had aweak positive correlation to product ratings. Therefore, making a product available globally doesn’tincrease product ratings (inferred from question 3).
+Ad-boost aff ected product ratings in a negatively way. This means that customers do not likeproducts that are boosted through advertisement or else there are factors in play here that are havinga negative eff ect on the ratings for products there are ad-boosted (inferred from question 3).
+
+References
+Morgan Stanley,2022, Global E-Commerce Growth Forecast 2022,
+https://www.morganstanley.com/ideas/global-ecommerce-growth-forecast-2022
+(https://www.morganstanley.com/ideas/global-ecommerce-growth-forecast-2022)
+Crunching the Data. (n.d.). Data Science Project Proposals. Retrieved from
+https://crunchingthedata.com/data-science-project-proposals/ (https://crunchingthedata.com/data-scienceproject-
+proposals/)
+JEFFREY MVUTU MABILAMA, 2020, Summer Clothes Sales [ Dataset], Kaggle
+https://www.kaggle.com/datasets/jmmvutu/summer-products-and-sales-in-ecommerce-wish
+Link to the license
+https://creativecommons.org/licenses/by/4.0/ (https://creativecommons.org/licenses/by/4.0/)
+Wish.com, 2023,
+https://www.wish.com/ (https://www.wish.com/)
