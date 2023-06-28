@@ -1,0 +1,173 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Question: correlation between price and sales.
+
+Reading data:
+```{r}
+sales_data_df <- read.csv(file = '~/Desktop/MDSA/602/Project/summer-products-with-rating-and-performance_2020-08.csv')
+```
+
+```{r}
+head(sales_data_df)
+```
+
+H0: average product rating is equal with products with quality badge and products with fast shipping badge.
+HA: average product rating depends on quality badge and fast shipping badge.
+
+1. Data Preparation
+
+Filtering out required columns.
+```{r}
+q3_df = data.frame(rating = sales_data_df$rating, rating_count = sales_data_df$rating_count, ad_boost = sales_data_df$uses_ad_boosts, total_badges = sales_data_df$badges_count, quality = sales_data_df$badge_product_quality, shipping = sales_data_df$badge_fast_shipping)
+```
+
+```{r}
+head(q3_df)
+```
+
+```{r}
+library(reshape2)
+q3_df2 <- tidyr::pivot_longer(q3_df, cols=c('ad_boost', 'total_badges'), names_to='variable', 
+values_to="value")
+
+ggplot(q3_df2, aes(x=value, y=rating, fill=variable)) +
+    geom_bar(stat='identity', position='dodge')
+```
+
+
+Getting product ratings that have got badges and are ad boosted.
+```{r}
+size_df = nrow(q3_df)
+required_products = numeric(sum(q3_df$total_badges) + sum(q3_df$ad_boost))
+required_products = as.data.frame(matrix(nrow=sum(q3_df$total_badges) + sum(q3_df$ad_boost),ncol=6))
+colnames(required_products) <- c('rating', 'rating_count','ad_boost','total_badges','quality','shipping')
+for(i in 1:size_df){
+  if(q3_df$total_badges[i] > 0 & q3_df$ad_boost[i] == 1){
+    next
+  }
+  if(q3_df$total_badges[i] > 0 | q3_df$ad_boost[i] == 1){
+    required_products[i,] = q3_df[i,]
+  }
+}
+required_products = na.omit(required_products)
+head(required_products)
+```
+
+2. Permutation test
+```{r}
+obsdiffmean = mean(required_products$rating[required_products$ad_boost == 1]) - mean(required_products$rating[required_products$total_badges > 0])
+total_required_products = nrow(required_products)
+total_ad_boost = count(required_products$rating[required_products$ad_boost == 1])
+N = 1000
+outcome = numeric(N)
+for(i in 1:N)
+{ index = sample(total_required_products, total_ad_boost, replace=FALSE)#taking adboost first
+  outcome[i] = mean(required_products$rating[index]) - mean(required_products$rating[-index])
+}
+head(outcome)
+```
+
+```{r}
+hist(outcome, xlab="Difference Between Means", ylab="Frequency", main="Outcome of 1000 Permutation Tests", col='orange')
+abline(v = obsdiffmean, col="red")
+```
+
+```{r}
+outcome_df = data.frame(outcome)
+```
+```{r}
+qdata(~ outcome, c(0.025, 0.975), data=outcome_df)
+sum(outcome < obsdiffmean)/1000 #P(mean(ad-boost) < mean(badges))
+sum(outcome >= obsdiffmean)/1000 #P(mean(badges) > mean(ad-boost))
+```
+Hence, we can reject H0 in favor of HA that product ratings for ad-boosted products and products with badges is different. Upon inspecting p-values, we can see average ratings for ad-boosted products were higher compared to products with badges such as quality, fast-shipping or local made.
+
+Since ad-boost influences ratings, lets check if ad-boost influences ratings in a positive way or negative.
+
+H0: Average product ratings for ad-boosted products is same as average ratings for non ad-boosted products.
+HA: Average product ratings for ad-boosted products is different than average ratings for non ad-boosted products.
+
+```{r}
+ggplot(data=required_products, aes(x = rating, y = factor(ad_boost))) + geom_violin(fill="brown") + geom_boxplot(width = 0.1, fill="orange") + xlab("Ratings") + ylab("Ad-boost") + ggtitle("Boxplots of ad-boosting") + coord_flip()
+```
+
+```{r}
+#t.test(~rating_count|uses_ad_boosts, conf.level=0.95, alternative = "greater", var.equal=FALSE, sales_data_df)
+```
+
+```{r}
+t.test(~rating|uses_ad_boosts, conf.level=0.95, alternative = "greater", var.equal=FALSE, sales_data_df)
+```
+p-value of 0.0252 shows that ad-boosting has an affect on product ratings(rejecting H0). Interestingly, ad-boosted products actually had worse ratings compared to non ad-boosted products.
+
+
+-------------combining rating and rating count(just an experiment not important for presentation--------
+
+```{r}
+q3a_df = data.frame(rating = sales_data_df$rating, rating_count = sales_data_df$rating_count, ad_boost = sales_data_df$uses_ad_boosts, total_badges = sales_data_df$badges_count, quality = sales_data_df$badge_product_quality, shipping = sales_data_df$badge_fast_shipping)
+```
+
+```{r}
+head(q3a_df)
+```
+
+```{r}
+q3a_df <- mutate(q3a_df, rating_norm = rating_count/rating)
+```
+
+```{r}
+head(q3a_df)
+```
+getting products with ad-boost and badges
+```{r}
+size_df = nrow(q3a_df)
+required_products_a = numeric(sum(q3a_df$total_badges) + sum(q3a_df$ad_boost))
+required_products_a = as.data.frame(matrix(nrow=sum(q3a_df$total_badges) + sum(q3a_df$ad_boost),ncol=7))
+colnames(required_products_a) <- c('rating', 'rating_count','ad_boost','total_badges','quality','shipping','rating_norm')
+for(i in 1:size_df){
+  if(q3a_df$total_badges[i] > 0 & q3a_df$ad_boost[i] == 1){
+    next
+  }
+  if(q3a_df$total_badges[i] > 0 | q3a_df$ad_boost[i] == 1){
+    required_products_a[i,] = q3a_df[i,]
+  }
+}
+required_products_a = na.omit(required_products_a)
+head(required_products_a)
+```
+performing permutation test for normalized ratings,
+```{r}
+obsdiffmean_a = mean(required_products_a$rating_norm[required_products_a$ad_boost == 1]) - mean(required_products_a$rating_norm[required_products_a$total_badges > 0])
+total_required_products = nrow(required_products_a)
+total_ad_boost = count(required_products_a$rating[required_products_a$ad_boost == 1])
+N = 1000
+outcome_a = numeric(N)
+for(i in 1:N)
+{ index = sample(total_required_products, total_ad_boost, replace=FALSE)#taking adboost first
+  outcome_a[i] = mean(required_products_a$rating_norm[index]) - mean(required_products_a$rating_norm[-index])
+}
+head(outcome_a)
+```
+
+```{r}
+hist(outcome_a, xlab="Difference Between Means", ylab="Frequency", main="Outcome of 1000 Permutation Tests", col='blue')
+abline(v = obsdiffmean_a, col="red")
+```
+
+```{r}
+outcome_df_a = data.frame(outcome_a)
+```
+```{r}
+qdata(~ outcome_a, c(0.025, 0.975), data=outcome_df_a)
+sum(outcome_a < obsdiffmean_a)/1000 #P(mean(ad-boost) < mean(badges))
+sum(outcome_a >= obsdiffmean_a)/1000 #P(mean(badges) > mean(ad-boost))
+```
+```{r}
+t.test(~rating_norm|ad_boost, conf.level=0.95, alternative = "greater", var.equal=FALSE, q3a_df)
+```
+
+
+

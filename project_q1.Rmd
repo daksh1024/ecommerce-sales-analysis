@@ -1,0 +1,131 @@
+---
+title: "Project Q1"
+output: html_notebook
+---
+
+ 
+Question: correlation between price and sales.
+
+Reading data:
+```{r}
+sales_data_df <- read.csv(file = '~/Desktop/MDSA/602/Project/summer-products-with-rating-and-performance_2020-08.csv')
+```
+
+```{r}
+head(sales_data_df)
+```
+
+```{r}
+unique(sales_data_df[c("units_sold")])
+```
+```{r}
+sales_data_df %>% group_by(units_sold) %>%tally()
+```
+
+H0: mean sale prices for products sold over 5000 units is same as product sold less than 1000 units.
+
+mean_retail_price_100 = mean_retail_price_5000
+
+HA: mean sale prices for products sold over 5000 is less than price of products less 1000 units.
+
+mean_retail_price_100 = mean_retail_price_5000
+
+Carrying out proportion test
+
+1. Data Preparation
+
+Filtering out required columns.
+```{r}
+q1_df = data.frame(price = sales_data_df$price, retail_price = sales_data_df$retail_price, units_sold = sales_data_df$units_sold)
+```
+
+```{r}
+head(q1_df)
+```
+
+
+Combining "units_sold" with values less than 100 into the category of 100 product_sold.
+
+```{r}
+q1_df$units_sold <- factor(q1_df$units_sold)
+```
+
+```{r}
+levels(q1_df$units_sold)
+```
+
+
+```{r}
+levels(q1_df$units_sold) <- list("100"=c("1", "2", "3", "6", "7", "8", "10", "50", "100"),"5000"=c("5000", "10000", "20000", "50000", "100000"))
+```
+
+```{r}
+q1_df %>% group_by(units_sold) %>%tally()
+```
+
+Removing NA values.
+
+```{r}
+q1_df <- na.omit(q1_df)
+```
+
+2. Visual analysis.
+```{r}
+ggplot(data=q1_df, aes(x = units_sold, y = retail_price)) + geom_violin(fill="blue") + geom_boxplot(width = 0.1, fill="orange") + xlab("Units Sold") + ylab("Retail price of products") + ggtitle("Violin plot of retail prices") + coord_flip()
+```
+
+3. Creating distribution of bootstrap statistics for the difference in means.
+```{r}
+ntrials = 1000
+n.sold_100 = favstats(~retail_price|units_sold, data=q1_df)$n[1]
+n.sold_5000 = favstats(~retail_price|units_sold, data=q1_df)$n[2]
+n.sold_100
+n.sold_5000
+```
+
+```{r}
+mean.sold_100 = numeric(ntrials)
+mean.sold_5000 = numeric(ntrials) 
+diffmeanssold = numeric(ntrials)
+units_sold_100 = filter(q1_df, units_sold=="100")
+units_sold_5000 = filter(q1_df, units_sold=="5000")
+```
+
+```{r}
+head(units_sold_100)
+```
+```{r}
+head(units_sold_5000)
+```
+
+```{r}
+for(i in 1:ntrials)
+{   mean.sold_100[i] = mean(sample(units_sold_100$retail_price, n.sold_100, replace=TRUE))
+    mean.sold_5000[i] = mean(sample(units_sold_5000$retail_price, n.sold_5000, replace=TRUE))
+    diffmeanssold[i] = mean.sold_100[i] - mean.sold_5000[i]
+}
+boot_diffmeanssold = data.frame(mean.sold_100, mean.sold_5000, diffmeanssold)
+```
+
+```{r}
+head(boot_diffmeanssold)
+```
+
+```{r}
+ggplot(data=boot_diffmeanssold, aes(x = diffmeanssold)) + geom_histogram(fill='blue', col='red', binwidth=1) + xlab("Difference Between Mean of units sold") + ggtitle("Distribution of Mean(100 units) - Mean(5000 units)")
+```
+
+4. Building 95% confidence interval.
+```{r}
+qdata(~ diffmeanssold, c(0.025, 0.975), data=boot_diffmeanssold)
+```
+
+It can be observed that 0 lies between the confidence interval of -2.1186 - 4.5659.
+
+Since we have significantly more number of sample count, validating our confidence interval using a t-test.
+```{r}
+t.test(~retail_price|units_sold, conf.level=0.95, alternative = "two.sided", var.equal=FALSE, q1_df)
+```
+Since p-value of 0.4958 > alpha(0.05), we cannot reject our null hypothesis.
+Hence, there is no difference in means of products that are sold less than 100 units versus products sold over 5000. This can mean that though price is a factor for customers to buy a product, it is not the main factor affecting the sales of the respective products.
+
