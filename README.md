@@ -1,7 +1,7 @@
 # Ecommerce Sales Analysis
 Statistical approach towards online clothes sales analysis
 
-Introduction
+# Introduction
 At one point in history, a pair of good, clean clothes were considered a necessity, but times have changed.Shopping and especially buying new clothes is a leisure activity for many people. This is the domain we aretackling in this project. We have analyzed the e-commerce sale for July 2020 of summer clothes on the Wish.comwebsite. Wish is an e-commerce company that sells varieties of clothing as well as accessories and is based inthe UK. We will answer a few guiding questions that made us curious at the beginning of the project and willsummarize them using statistics.
 Guiding Questions
 1. Is a product sold more just because it is priced competitively?
@@ -13,7 +13,7 @@ Ratings are an important marker for a customer to see if a product is good or no
 Data Source and Preparation
 The dataset used is taken from Kaggle. It is a public dataset and has been permitted for general use. Essentially,this data fi nds its origin from Wish Uk’s e-commerce platform. It is a subset of total sales data showing thesummer sales for July 2020, and contains 43 columns and 1574 rows.
 
-Conclusion
+# Conclusion
 It was very interesting data set to work on as our Null Hypothesis was rejected in some scenarios and insome cases, we did not reject our Null Hypothesis.
 To give the marketing or sales team an analysis of what factors aff ected Sales in the UK on Wish’s platform,we can confi dently say that:
 Price does not aff ect sales volume (inferred from question 1).
@@ -21,7 +21,7 @@ Product color aff ects sales volume. Buyers preferred cool colors over warm colo
 Shipping fee did not aff ect product ratings while products that were shipped to more countries had aweak positive correlation to product ratings. Therefore, making a product available globally doesn’tincrease product ratings (inferred from question 3).
 Ad-boost aff ected product ratings in a negatively way. This means that customers do not likeproducts that are boosted through advertisement or else there are factors in play here that are havinga negative eff ect on the ratings for products there are ad-boosted (inferred from question 3).
 
-References
+# References
 Morgan Stanley,2022, Global E-Commerce Growth Forecast 2022,
 https://www.morganstanley.com/ideas/global-ecommerce-growth-forecast-2022
 (https://www.morganstanley.com/ideas/global-ecommerce-growth-forecast-2022)
